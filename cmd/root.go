@@ -5,6 +5,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+
+	_ "github.com/clh97/ecs/config"
 )
 
 var (
@@ -27,12 +29,10 @@ func Execute() error {
 }
 
 func init() {
-	cobra.OnInitialize()
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ecs.yaml)")
-	rootCmd.PersistentFlags().StringP("author", "a", "Michel Calheiros", "michel@calheiros.dev")
+	cobra.OnInitialize(initConfig)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ecs.config.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "MIT")
 	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
 	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	viper.SetDefault("author", "Michel Calheiros <michel@calheiros.dev")
 	viper.SetDefault("license", "MIT")
