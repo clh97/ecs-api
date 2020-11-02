@@ -12,7 +12,6 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.0
 	github.com/ugorji/go v1.1.13 // indirect
-	go.uber.org/zap v1.10.0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

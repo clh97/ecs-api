@@ -1,17 +1,20 @@
 package config
 
 import (
-	config "github.com/spf13/viper"
+	"github.com/spf13/viper"
 )
 
 func init() {
-	config.SetDefault("logger.level", "info")
-	config.SetDefault("logger.encoding", "console")
-	config.SetDefault("logger.color", true)
-	config.SetDefault("logger.dev_mode", true)
-	config.SetDefault("logger.disable_caller", false)
-	config.SetDefault("logger.disable_stacktrace", true)
+	viper.SetDefault("logger.level", "info")
+	viper.SetDefault("logger.encoding", "console")
+	viper.SetDefault("logger.color", true)
+	viper.SetDefault("logger.dev_mode", true)
+	viper.SetDefault("logger.disable_caller", false)
+	viper.SetDefault("logger.disable_stacktrace", true)
 
-	config.SetDefault("server.host", "0.0.0.0")
-	config.SetDefault("server.port", "3000")
+	viper.SetDefault("server.host", "0.0.0.0")
+	viper.SetDefault("server.port", "3000")
+
+	viper.SetDefault("author", "Michel Calheiros <michel@calheiros.dev")
+	viper.SetDefault("license", "MIT")
 }
