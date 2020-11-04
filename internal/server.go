@@ -18,7 +18,11 @@ func InitServer() {
 		Handler: router,
 	}
 
-	server.ListenAndServe()
+	err := server.ListenAndServe()
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 func getAddr() string {
