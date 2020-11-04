@@ -1,0 +1,23 @@
+FROM golang as dev
+
+ENV GO111MODULE=on \
+  CGO_ENABLED=0 \
+  GOOS=linux \
+  GOARCH=amd64
+
+# make
+# RUN apt-get update && apt-get upgrade
+
+# app
+WORKDIR /usr/app
+
+COPY . .
+
+# go dependencies
+RUN go get
+# for compile
+RUN go get github.com/githubnemo/CompileDaemon
+
+EXPOSE 3000
+
+ENTRYPOINT CompileDaemon -include="Makefile" --build="make" --command="/usr/app/ecs api" -log-prefix=true
