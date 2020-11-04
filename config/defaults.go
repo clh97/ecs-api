@@ -12,8 +12,8 @@ func init() {
 	viper.SetDefault("logger.disable_caller", false)
 	viper.SetDefault("logger.disable_stacktrace", true)
 
-	viper.SetDefault("server.host", "0.0.0.0")
-	viper.SetDefault("server.port", "3000")
+	viper.SetDefault("server.addr", "0.0.0.0")
+	viper.SetDefault("server.port", 3000)
 
 	viper.SetDefault("author", "Michel Calheiros <michel@calheiros.dev")
 	viper.SetDefault("license", "MIT")
