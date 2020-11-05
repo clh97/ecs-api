@@ -6,13 +6,15 @@ import (
 )
 
 // RequestID acts as middleware, setting up the RID header as some UUID
-func RequestID(c *gin.Context) {
-	uuid, err := uuid.NewUUID()
+func RequestID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		uuid, err := uuid.NewUUID()
 
-	if err != nil {
-		return
+		if err != nil {
+			return
+		}
+
+		c.Header("RID", uuid.String())
+		c.Next()
 	}
-
-	c.Header("RID", uuid.String())
-	c.Next()
 }

@@ -8,5 +8,5 @@ import (
 
 // Home is the handler for the home endpoint
 func Home(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome home!"})
+	c.JSON(http.StatusOK, gin.H{"message": "Welcome home! =D"})
 }

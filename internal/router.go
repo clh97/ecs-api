@@ -11,9 +11,18 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	r.Use(middlewares.RequestID)
+	r.Use(middlewares.RequestID())
 
-	r.GET("/", endpoints.Home)
+	/* Public routes */
+	public := r.Group("/api/v1")
+	public.POST("/auth", endpoints.Auth)
+
+	/* Private routes */
+	private := r.Group("/api/v1")
+	private.Use(middlewares.JWT())
+	{
+		private.GET("/", endpoints.Home)
+	}
 
 	return r
 }

@@ -20,4 +20,4 @@ RUN go get github.com/githubnemo/CompileDaemon
 
 EXPOSE 3000
 
-ENTRYPOINT CompileDaemon -include="Makefile" --build="make" --command="/usr/app/ecs api" -log-prefix=true
+ENTRYPOINT CompileDaemon -include="Makefile" --build="make" --command="/usr/app/bin/ecs api --config ecs.config.yml" -log-prefix=true

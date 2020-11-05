@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	viper "github.com/spf13/viper"
 )
 
 // InitServer initializes http listening and sets up endpoints
 func InitServer() {
+	gin.ForceConsoleColor()
+
 	router := InitRouter()
 
 	addr := getAddr()

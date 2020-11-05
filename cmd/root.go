@@ -2,12 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/clh97/ecs/config"
 )
 
 var (
@@ -20,20 +17,30 @@ var (
 	}
 )
 
-func er(msg interface{}) {
-	fmt.Println("Error:", msg)
-	os.Exit(1)
-}
-
 // Execute runs the root command
 func Execute() error {
 	return rootCmd.Execute()
 }
 
 func init() {
-	cobra.OnInitialize(func() { config.Initialize(cfgFile) })
+	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ecs.config.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "MIT")
 	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
 	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
+}
+
+func initConfig() {
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	} else {
+		viper.AddConfigPath("./")
+		viper.SetConfigName("ecs.viper")
+	}
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
 }
