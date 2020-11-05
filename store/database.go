@@ -27,22 +27,35 @@ var (
 	dbConfig *DbConfig
 )
 
-// GetQuery returns formatted querystring according to viper configurations
-func GetQuery() string {
+// GetConnectionQuery returns formatted querystring according to viper configurations
+func GetConnectionQuery() string {
 	query := fmt.Sprintf("host=%s user=%s port=%s password=%s dbname=%s sslmode=%s", dbConfig.addr, dbConfig.user, dbConfig.port, dbConfig.password, dbConfig.dbName, dbConfig.sslMode)
 	return query
 }
 
-// InitDatabase initializes db instance and executes schema query
-func InitDatabase() {
+// CreateDBInstance return a new DB instance
+func CreateDBInstance() (*sqlx.DB, error) {
 	var (
 		driver = viper.GetString("database.driver")
 	)
 
 	dbConfig = initConfig()
 
-	query := GetQuery()
+	query := GetConnectionQuery()
+
 	db, err := sqlx.Connect(driver, query)
+
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return db, nil
+}
+
+// InitDatabase initializes db instance and executes schema query
+func InitDatabase() {
+	db, err := CreateDBInstance()
 
 	if err != nil {
 		log.Fatal(err)

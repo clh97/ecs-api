@@ -10,3 +10,6 @@ database:
   driver: postgres
   dbName: ecs
   sslMode: disable
+
+security:
+  jwtSecret: QU9Xtt8VKsixKcJfYZL]]#uocL4i0G13

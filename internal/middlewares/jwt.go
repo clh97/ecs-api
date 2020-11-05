@@ -2,8 +2,10 @@ package middlewares
 
 import (
 	"net/http"
+	"strings"
 
-	"github.com/clh97/ecs/internal/network"
+	"github.com/clh97/ecs/internal/constants"
+	"github.com/clh97/ecs/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +15,15 @@ func JWT() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusBadRequest, network.MissingAuthHeaderError)
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.MissingAuthHeaderError)
+			return
+		}
+
+		parts := strings.Split(authHeader, " ")
+
+		if len(parts) <= 1 || !utils.ValidateToken(parts[1]) {
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.InvalidTokenError)
+			return
 		}
 
 		c.Next()
