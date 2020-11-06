@@ -15,14 +15,14 @@ func JWT() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.MissingAuthHeaderError)
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(nil, "Missing Authorization header", ""))
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 
 		if len(parts) <= 1 || !utils.ValidateToken(parts[1]) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.InvalidTokenError)
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(nil, "Invalid token", ""))
 			return
 		}
 

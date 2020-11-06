@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/lib/pq"
 )
 
 var validate *validator.Validate
@@ -20,15 +19,30 @@ var validate *validator.Validate
 func Authenticate(c *gin.Context) {
 	payload := dtos.Login{}
 
-	// Data validation
-	if err := c.ShouldBind(&payload); err != nil {
-		for _, fieldErr := range err.(validator.ValidationErrors) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.JSONValidationError(fieldErr, fmt.Sprintf("%s %s", fieldErr.Field(), fieldErr.Tag())))
+	// Binding
+	err := c.ShouldBindJSON(&payload)
+
+	// Validation
+	err = validate.Struct(payload)
+
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s is invalid", err.Field()), ""))
 			return
 		}
+		log.Fatal(err)
+		return
 	}
 
-	c.JSON(http.StatusOK, constants.Success(nil, "Successfully authenticated"))
+	// Service
+	result, svcErr := services.AuthenticateUser(payload)
+
+	if svcErr != nil {
+		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+		return
+	}
+
+	c.JSON(result.HTTPStatus, result.HTTPResponse)
 }
 
 // Create is the handler for user creation endpoint
@@ -39,7 +53,7 @@ func Create(c *gin.Context) {
 	err := c.ShouldBindJSON(&payload)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, constants.JSONValidationError(err, err.Error()))
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Bad request", ""))
 		return
 	}
 
@@ -47,9 +61,8 @@ func Create(c *gin.Context) {
 	err = validate.Struct(payload)
 
 	if err != nil {
-		// Iterates through every validation errors and returns first one
 		for _, err := range err.(validator.ValidationErrors) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.JSONValidationError(err, fmt.Sprintf("%s is invalid", err.Field())))
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s is invalid", err.Field()), ""))
 			return
 		}
 		log.Fatal(err)
@@ -57,22 +70,16 @@ func Create(c *gin.Context) {
 	}
 
 	// Service
-	_, err = services.CreateUser(payload)
+	result, svcErr := services.CreateUser(payload)
 
 	// Service error check
-	if err != nil {
-		if err, ok := err.(*pq.Error); ok {
-			if constants.IsErrUniqueViolation(err) {
-				c.AbortWithStatusJSON(http.StatusConflict, constants.ResourceConflictError(err, "Email already registered"))
-				return
-			}
-		}
-		c.AbortWithStatusJSON(http.StatusBadRequest, constants.InternalError)
+	if svcErr != nil {
+		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
 		return
 	}
 
 	// Success
-	c.JSON(http.StatusCreated, constants.ResourceCreated(nil, "Successfully created resource"))
+	c.JSON(result.HTTPStatus, result.HTTPResponse)
 }
 
 func init() {

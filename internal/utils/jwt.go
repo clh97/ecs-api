@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -14,8 +12,7 @@ import (
 func CreateToken(userID int) (string, error) {
 	var err error
 
-	expString := os.Getenv("TOKEN_EXP_MINS")
-	expMinutes, err := strconv.Atoi(expString)
+	expMinutes := viper.GetInt("security.jwtExpMinutes")
 
 	if err != nil {
 		return "", err
@@ -27,7 +24,7 @@ func CreateToken(userID int) (string, error) {
 	atClaims["user_id"] = userID
 	atClaims["exp"] = time.Now().Add(time.Minute * time.Duration(expMinutes)).Unix()
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	jwtSecret := viper.GetString("jwtSecret")
+	jwtSecret := viper.GetString("security.jwtSecret")
 	token, err := at.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return "", err
@@ -37,7 +34,7 @@ func CreateToken(userID int) (string, error) {
 
 // ValidateToken validated token according to method and secret
 func ValidateToken(tokenString string) bool {
-	jwtSecret := viper.GetString("jwtSecret")
+	jwtSecret := viper.GetString("security.jwtSecret")
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtSecret), nil
@@ -56,7 +53,7 @@ func ValidateToken(tokenString string) bool {
 
 // DecodeToken decodes the specified jwt token and returns the necessary data
 func DecodeToken(tokenString string) (jwt.MapClaims, error) {
-	jwtSecret := viper.GetString("jwtSecret")
+	jwtSecret := viper.GetString("security.jwtSecret")
 
 	token, err := StripBearerPrefix(tokenString)
 

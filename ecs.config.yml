@@ -13,3 +13,4 @@ database:
 
 security:
   jwtSecret: QU9Xtt8VKsixKcJfYZL]]#uocL4i0G13
+  jwtExpMinutes: 3600
