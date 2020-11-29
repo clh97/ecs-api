@@ -35,7 +35,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.AddConfigPath("./")
-		viper.SetConfigName("ecs.viper")
+		viper.SetConfigName("ecs.config")
 	}
 
 	viper.AutomaticEnv()
