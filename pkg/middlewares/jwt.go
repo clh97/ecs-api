@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/clh97/ecs/internal/constants"
-	"github.com/clh97/ecs/internal/utils"
+	"github.com/clh97/ecs/pkg/constants"
+	"github.com/clh97/ecs/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

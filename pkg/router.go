@@ -1,8 +1,8 @@
-package internal
+package pkg
 
 import (
-	"github.com/clh97/ecs/internal/endpoints"
-	"github.com/clh97/ecs/internal/middlewares"
+	"github.com/clh97/ecs/pkg/endpoints"
+	"github.com/clh97/ecs/pkg/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
