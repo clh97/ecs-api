@@ -17,12 +17,15 @@ func InitRouter() *gin.Engine {
 	public := r.Group("/api/v1")
 	public.POST("/sign-up", endpoints.Create)
 	public.POST("/sign-in", endpoints.Authenticate)
+	public.POST("/public-comment", endpoints.PublicComment)
 
 	/* Private routes */
 	private := r.Group("/api/v1")
 	private.Use(middlewares.JWT())
 	{
-		private.GET("/", endpoints.Home)
+		private.POST("/app", endpoints.CreateApp)
+		private.GET("/app", endpoints.GetApps)
+		private.POST("/private-comment", endpoints.PrivateComment)
 	}
 
 	return r
