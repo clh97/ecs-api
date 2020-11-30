@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/clh97/ecs/internal"
+	"github.com/clh97/ecs/pkg"
 	"github.com/clh97/ecs/store"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ var apiCmd = &cobra.Command{
 	Short: "Runs the API",
 	Run: func(cmd *cobra.Command, args []string) {
 		store.InitDatabase()
-		internal.InitServer()
+		pkg.InitServer()
 	},
 }
 

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/clh97/ecs/internal/constants"
-	"github.com/clh97/ecs/internal/dtos"
-	"github.com/clh97/ecs/internal/types"
-	"github.com/clh97/ecs/internal/utils"
+	"github.com/clh97/ecs/pkg/constants"
+	"github.com/clh97/ecs/pkg/dtos"
+	"github.com/clh97/ecs/pkg/types"
+	"github.com/clh97/ecs/pkg/utils"
 	"github.com/clh97/ecs/store"
 	"github.com/lib/pq"
 )

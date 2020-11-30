@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/clh97/ecs/internal/constants"
-	"github.com/clh97/ecs/internal/dtos"
-	"github.com/clh97/ecs/internal/services"
+	"github.com/clh97/ecs/pkg/constants"
+	"github.com/clh97/ecs/pkg/dtos"
+	"github.com/clh97/ecs/pkg/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
