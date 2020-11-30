@@ -98,8 +98,6 @@ func GetApps(userID int) (*constants.ServiceResult, *constants.ServiceError) {
 
 	err = db.Select(&apps, "SELECT name, url, url_id, created_at FROM ecs_app WHERE owner_id = $1", userID)
 
-	fmt.Println(len(apps), userID)
-
 	if err != nil {
 		svcError := new(constants.ServiceError)
 		fmt.Println(err)
