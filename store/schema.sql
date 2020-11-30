@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS ecs_anon (
 );
 
 CREATE TABLE IF NOT EXISTS ecs_comment (
-  user_id serial PRIMARY KEY, /* ecs_user.id or ecs_anon.id */
+  id serial PRIMARY KEY, /* ecs_user.id or ecs_anon.id */
   app_id serial, /* ecs_app.id */
   page_id serial, /* ecs_app.pages[x].id */
   user_id serial,
