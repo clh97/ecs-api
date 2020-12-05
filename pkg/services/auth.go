@@ -43,14 +43,15 @@ func CreateUser(payload dtos.AccountCreation) (*constants.ServiceResult, *consta
 			Success:   false,
 		}
 		svcError.HTTPStatus = http.StatusInternalServerError
+
 		return nil, svcError
 	}
 
 	tx := db.MustBegin()
 
-	_, err = tx.Exec("INSERT INTO ecs_user (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)", payload.FirstName, payload.LastName, payload.Email, hashed)
+	query := "INSERT INTO ecs_user (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)"
 
-	if err != nil {
+	if _, err := tx.Exec(query, payload.FirstName, payload.LastName, payload.Email, hashed); err != nil {
 		svcError := new(constants.ServiceError)
 
 		if err, ok := err.(*pq.Error); ok {
@@ -85,7 +86,6 @@ func CreateUser(payload dtos.AccountCreation) (*constants.ServiceResult, *consta
 		Success:   true,
 	}
 	svcResult.HTTPStatus = http.StatusCreated
-
 	return svcResult, nil
 }
 
@@ -110,7 +110,17 @@ func AuthenticateUser(payload dtos.Login) (*constants.ServiceResult, *constants.
 
 	user := types.User{}
 
-	err = db.Get(&user, "SELECT id, email, password FROM ecs_user WHERE email = $1", payload.Email)
+	if err = db.Get(&user, "SELECT id, email, password FROM ecs_user WHERE email = $1", payload.Email); err != nil {
+		svcError := new(constants.ServiceError)
+		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+			Error:     errors.New("Unable to query database for user"),
+			Message:   "Internal server error",
+			Timestamp: time.Now(),
+			Success:   false,
+		}
+		svcError.HTTPStatus = http.StatusInternalServerError
+		return nil, svcError
+	}
 
 	if user == (types.User{}) {
 		svcError := new(constants.ServiceError)
@@ -121,18 +131,6 @@ func AuthenticateUser(payload dtos.Login) (*constants.ServiceResult, *constants.
 			Success:   false,
 		}
 		svcError.HTTPStatus = http.StatusUnauthorized
-		return nil, svcError
-	}
-
-	if err != nil {
-		svcError := new(constants.ServiceError)
-		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
-			Error:     errors.New("Unable to query database for user"),
-			Message:   "Internal server error",
-			Timestamp: time.Now(),
-			Success:   false,
-		}
-		svcError.HTTPStatus = http.StatusInternalServerError
 		return nil, svcError
 	}
 
