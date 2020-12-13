@@ -20,12 +20,12 @@ func CreateApp(c *gin.Context) {
 	payload := dtos.AppCreation{}
 
 	// Binding
-	err := c.ShouldBindJSON(&payload)
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s structure is invalid", err.Error()), ""))
+	}
 
 	// Validation
-	err = validate.Struct(payload)
-
-	if err != nil {
+	if err := validate.Struct(payload); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s is invalid", err.Field()), ""))
 			return
