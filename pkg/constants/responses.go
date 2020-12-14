@@ -37,17 +37,22 @@ func HTTPResponse(payload interface{}, message string) THTTPResponse {
 
 // HTTPErrorResponse is the constructor for a unsuccessful http response
 func HTTPErrorResponse(err error, message string, redirect string) THTTPErrorResponse {
-	var validationErrors []utils.ValidationError
+	var responseValidationErrors []utils.ValidationError
 
-	if validationError, ok := err.(validator.ValidationErrors); ok {
-		validationErrors = utils.ParseValidationErrors(validationError)
+	if validationError, ok := err.(validator.FieldError); ok {
+		responseValidationError := utils.ParseValidationError(validationError)
+		responseValidationErrors = append(responseValidationErrors, responseValidationError)
+	}
+
+	if validationErrors, ok := err.(validator.ValidationErrors); ok {
+		responseValidationErrors = utils.ParseValidationErrors(validationErrors)
 	}
 
 	return THTTPErrorResponse{
 		Message:          message,
 		Error:            err,
 		Redirect:         redirect,
-		ValidationErrors: validationErrors,
+		ValidationErrors: responseValidationErrors,
 		Timestamp:        time.Now(),
 		Success:          false,
 	}
