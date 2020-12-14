@@ -113,12 +113,12 @@ func AuthenticateUser(payload dtos.Login) (*constants.ServiceResult, *constants.
 	if err = db.Get(&user, "SELECT id, email, password FROM ecs_user WHERE email = $1", payload.Email); err != nil {
 		svcError := new(constants.ServiceError)
 		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
-			Error:     errors.New("Unable to query database for user"),
-			Message:   "Internal server error",
+			Error:     errors.New("Unauthorized"),
+			Message:   "Invalid username or password",
 			Timestamp: time.Now(),
 			Success:   false,
 		}
-		svcError.HTTPStatus = http.StatusInternalServerError
+		svcError.HTTPStatus = http.StatusUnauthorized
 		return nil, svcError
 	}
 
@@ -162,6 +162,16 @@ func AuthenticateUser(payload dtos.Login) (*constants.ServiceResult, *constants.
 			svcError.HTTPStatus = http.StatusInternalServerError
 			return nil, svcError
 		}
+	} else {
+		svcError := new(constants.ServiceError)
+		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+			Error:     errors.New("Unauthorized"),
+			Message:   "Invalid username or password",
+			Timestamp: time.Now(),
+			Success:   false,
+		}
+		svcError.HTTPStatus = http.StatusUnauthorized
+		return nil, svcError
 	}
 
 	svcResult := new(constants.ServiceResult)

@@ -1,0 +1,16 @@
+server:
+  addr: 0.0.0.0
+  port: 3001
+
+database:
+  addr: localhost
+  port: 5432
+  user: postgres
+  password: 123456*
+  driver: postgres
+  dbName: ecs
+  sslMode: disable
+
+security:
+  jwtSecret: "QU9Xtt8VKsixKcJfYZL]]#uocL4i0G13"
+  jwtExpMinutes: 3600

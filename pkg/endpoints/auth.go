@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -20,14 +19,15 @@ func Authenticate(c *gin.Context) {
 	payload := dtos.Login{}
 
 	// Binding
-	err := c.ShouldBindJSON(&payload)
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
+		return
+	}
 
 	// Validation
-	err = validate.Struct(payload)
-
-	if err != nil {
+	if err := validate.Struct(payload); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s is invalid", err.Field()), ""))
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
 			return
 		}
 		log.Fatal(err)
@@ -50,22 +50,14 @@ func Create(c *gin.Context) {
 	payload := dtos.AccountCreation{}
 
 	// Binding
-	err := c.ShouldBindJSON(&payload)
-
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Bad request", ""))
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
 		return
 	}
 
 	// Validation
-	err = validate.Struct(payload)
-
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s is invalid", err.Field()), ""))
-			return
-		}
-		log.Fatal(err)
+	if err := validate.Struct(payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
 		return
 	}
 
