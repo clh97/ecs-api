@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -28,7 +27,7 @@ func Authenticate(c *gin.Context) {
 	// Validation
 	if err := validate.Struct(payload); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s is invalid", err.Field()), ""))
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, err.Error(), ""))
 			return
 		}
 		log.Fatal(err)
