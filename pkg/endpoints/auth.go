@@ -22,6 +22,7 @@ func Authenticate(c *gin.Context) {
 	// Binding
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s structure is invalid", err.Error()), ""))
+		return
 	}
 
 	// Validation
@@ -52,6 +53,7 @@ func Create(c *gin.Context) {
 	// Binding
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, fmt.Sprintf("%s structure is invalid", err.Error()), ""))
+		return
 	}
 
 	// Validation
