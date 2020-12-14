@@ -20,14 +20,14 @@ func CreateApp(c *gin.Context) {
 
 	// Binding
 	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, err.Error(), ""))
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
 		return
 	}
 
 	// Validation
 	if err := validate.Struct(payload); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, err.Error(), ""))
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
 			return
 		}
 		log.Fatal(err)
