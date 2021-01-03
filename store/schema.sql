@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS ecs_app (
 
 CREATE TABLE IF NOT EXISTS ecs_page (
   id serial PRIMARY KEY,
+  page_id text NOT NULL,
+  app_id uuid NOT NULL,
   title text NOT NULL,
   url text,
   created_at timestamp NOT NULL DEFAULT NOW()
