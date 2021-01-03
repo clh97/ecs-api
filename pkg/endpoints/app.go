@@ -45,6 +45,36 @@ func CreateApp(c *gin.Context) {
 	c.JSON(result.HTTPStatus, result.HTTPResponse)
 }
 
+func DeleteApp(c *gin.Context) {
+	payload := dtos.AppDelete{}
+
+	// Binding
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
+		return
+	}
+
+	// Validation
+	if err := validate.Struct(payload); err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
+			return
+		}
+		log.Fatal(err)
+		return
+	}
+
+	// Service
+	result, svcErr := services.DeleteApp(payload)
+
+	if svcErr != nil {
+		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+		return
+	}
+
+	c.JSON(result.HTTPStatus, result.HTTPResponse)
+}
+
 // GetApps is the handler for the app list endpoint
 func GetApps(c *gin.Context) {
 	userID := utils.GetUserIDFromContext(c)
