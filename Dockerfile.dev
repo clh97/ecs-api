@@ -2,8 +2,7 @@ FROM golang as dev
 
 ENV GO111MODULE=on \
   CGO_ENABLED=0 \
-  GOOS=linux \
-  GOARCH=amd64
+  GOOS=linux
 
 # make
 # RUN apt-get update && apt-get upgrade
@@ -13,11 +12,12 @@ WORKDIR /usr/app
 
 COPY . .
 
-# go dependencies
-RUN go get
 # for compile
 RUN go get github.com/githubnemo/CompileDaemon
 
+# go dependencies
+RUN go get
+
 EXPOSE 3000
 
-ENTRYPOINT CompileDaemon -include="Makefile" --build="make" --command="/usr/app/bin/ecs api --config ecs.config.yml" -log-prefix=true
+ENTRYPOINT /go/bin/CompileDaemon -include="Makefile" --build="make" --command="/usr/app/bin/ecs api --config ecs.config.yml" -log-prefix=true
