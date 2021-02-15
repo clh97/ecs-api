@@ -1,6 +1,7 @@
 package services
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/clh97/ecs/pkg/constants"
 	"github.com/clh97/ecs/pkg/dtos"
 	"github.com/clh97/ecs/pkg/types"
+	"github.com/clh97/ecs/pkg/utils"
 	"github.com/clh97/ecs/store"
 	"github.com/gin-gonic/gin"
 )
@@ -35,10 +37,11 @@ func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants
 	page := types.Page{
 		Title:    payload.Title,
 		URL:      payload.URL,
+		Slug:     utils.Slugify(payload.Title),
 		AppURLID: payload.AppURLID,
 	}
 
-	result, err := db.NamedExec("INSERT INTO ecs_page (title, url, app_id) VALUES (:title, :url, :appurlid)", page)
+	result, err := db.NamedExec("INSERT INTO ecs_page (title, url, slug, app_id) VALUES (:title, :url, :slug, :appurlid)", page)
 
 	fmt.Println(result, page.Title)
 
@@ -67,7 +70,7 @@ func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants
 	return svcResult, nil
 }
 
-// GetPage implements page retrieval functionality
+// GetPage implements single page retrieval functionality
 func GetPage(payload dtos.PageGet) (*constants.ServiceResult, *constants.ServiceError) {
 	db, err := store.CreateDBInstance()
 
@@ -88,9 +91,34 @@ func GetPage(payload dtos.PageGet) (*constants.ServiceResult, *constants.Service
 
 	page := types.Page{}
 
-	db.QueryRowx("SELECT * FROM ecs_page WHERE page_id = $1 AND app_id = $2", payload.PageID, payload.AppURLID).Scan(&page)
+	row := db.QueryRow("SELECT page_id, title, slug, url FROM ecs_page WHERE page_id = $1 AND app_id = $2", payload.PageID, payload.AppURLID)
 
-	fmt.Println(page)
+	err = row.Scan(&page.PageID, &page.Title, &page.Slug, &page.URL)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			svcError := new(constants.ServiceError)
+			svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+				Error:     err,
+				Message:   "Unable to find page",
+				Timestamp: time.Now(),
+				Success:   false,
+			}
+			svcError.HTTPStatus = http.StatusNotFound
+			return nil, svcError
+		default:
+			svcError := new(constants.ServiceError)
+			svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+				Error:     err,
+				Message:   "Internal server error",
+				Timestamp: time.Now(),
+				Success:   false,
+			}
+			svcError.HTTPStatus = http.StatusInternalServerError
+			return nil, svcError
+		}
+	}
 
 	if page.IsEmpty() {
 		svcError := new(constants.ServiceError)
@@ -111,6 +139,70 @@ func GetPage(payload dtos.PageGet) (*constants.ServiceResult, *constants.Service
 			"Page": page,
 		},
 		Message:   "Successfully retrieved page",
+		Timestamp: time.Now(),
+		Success:   true,
+	}
+	svcResult.HTTPStatus = http.StatusOK
+
+	return svcResult, nil
+}
+
+// GetPages implements page listing functionality
+func GetPages(payload dtos.PagesGet) (*constants.ServiceResult, *constants.ServiceError) {
+	db, err := store.CreateDBInstance()
+
+	defer db.Close()
+
+	if err != nil {
+		svcError := new(constants.ServiceError)
+		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+			Error:     errors.New("Unable to create db instance"),
+			Message:   "Internal server error",
+			Timestamp: time.Now(),
+			Success:   false,
+		}
+		svcError.HTTPStatus = http.StatusInternalServerError
+
+		return nil, svcError
+	}
+
+	pages := []types.Page{}
+
+	err = db.Select(&pages, "SELECT page_id, title, slug, url FROM ecs_page WHERE app_id = $1", payload.AppURLID)
+
+	fmt.Println(err)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			svcError := new(constants.ServiceError)
+			svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+				Error:     err,
+				Message:   "Unable to find pages",
+				Timestamp: time.Now(),
+				Success:   false,
+			}
+			svcError.HTTPStatus = http.StatusNotFound
+			return nil, svcError
+		default:
+			svcError := new(constants.ServiceError)
+			svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+				Error:     err,
+				Message:   "Internal server error",
+				Timestamp: time.Now(),
+				Success:   false,
+			}
+			svcError.HTTPStatus = http.StatusInternalServerError
+			return nil, svcError
+		}
+	}
+
+	svcResult := new(constants.ServiceResult)
+	svcResult.HTTPResponse = constants.THTTPResponse{
+		Data: gin.H{
+			"Pages": pages,
+		},
+		Message:   "Successfully retrieved pages",
 		Timestamp: time.Now(),
 		Success:   true,
 	}
