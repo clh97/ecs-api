@@ -12,9 +12,10 @@ CREATE TABLE IF NOT EXISTS ecs_app (
 
 CREATE TABLE IF NOT EXISTS ecs_page (
   id serial PRIMARY KEY,
-  page_id text NOT NULL,
+  page_id uuid DEFAULT uuid_generate_v4(),
   app_id uuid NOT NULL,
   title text NOT NULL,
+  slug text,
   url text,
   created_at timestamp NOT NULL DEFAULT NOW()
 );

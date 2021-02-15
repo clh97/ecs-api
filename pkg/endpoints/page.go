@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"fmt"
-	"strconv"
+	"net/http"
 
 	"github.com/clh97/ecs/pkg/constants"
 	"github.com/clh97/ecs/pkg/dtos"
@@ -15,58 +15,59 @@ Page needs to be associated with some app
 ECS <- App <- Page <- User comment
 */
 
-/*
-	Page is the handler for the page endpoint
-	--
-	That means it's able to deal with page creation if it doesn't exist
-	and with page content listing if it does exist.
-	---
-	It works in this way to abstract the front end request into a single GET
-	instead of a POST and GET
-*/
-func Page(c *gin.Context) {
+// CreatePage creates a page in a app, identified by urlid
+func CreatePage(c *gin.Context) {
 
-	// payload := dtos.PageCreation{}
+	payload := dtos.PageCreation{}
 
 	// Binding
-	// if err := c.ShouldBindJSON(&payload); err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
-	// 	return
-	// }
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
+		return
+	}
 
-	// // Validation
-	// if err := validate.Struct(payload); err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
-	// 	return
-	// }
+	// Validation
+	if err := validate.Struct(payload); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
+		return
+	}
 
-	appID, _ := c.Params.Get("app-id")
-	pageIDStr, _ := c.Params.Get("page-id")
-	fmt.Println("App id:", appID)
-	fmt.Println("Page id:", pageIDStr)
+	urlID := c.Param("app-url-id")
+	fmt.Println("App URL id:", urlID)
 
-	// IF THE PAGE EXISTS, RETURN CONTENT
-	// IF NOT, CREATE PAGE
+	result, svcErr := services.CreatePage(payload)
 
-	pageID, _ := strconv.Atoi(pageIDStr)
+	if svcErr != nil {
+		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+		return
+	}
 
-	pageGetPayload := dtos.PageGet{AppURLID: appID, PageID: pageID}
+	c.JSON(result.HTTPStatus, result.HTTPResponse)
+}
+
+// GetPage returns a single page by its urlid and pageid
+func GetPage(c *gin.Context) {
+	urlID := c.Param("app-url-id")
+	pageID := c.Param("page-id")
+
+	pageGetPayload := dtos.PageGet{AppURLID: urlID, PageID: pageID}
 
 	// Service
 	result, svcErr := services.GetPage(pageGetPayload)
 
 	if svcErr != nil {
-		// This means the resource simply doesn't exist.
-		// We can now create it and keep the user happy
-		if errNotFound := svcErr.HTTPErrorResponse.Error == constants.ErrNotFound; errNotFound {
-			pageCreatePayload := dtos.PageCreation{}
-
-			// TODO: page creation stuff
-		} else {
-			c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
-			return
-		}
+		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+		return
 	}
 
-	c.JSON(result.HTTPStatus, result.HTTPResponse)
+	fmt.Println(result)
+
+	fmt.Println(urlID, pageID)
+}
+
+// GetPages returns a list o pages by its url id
+func GetPages(c *gin.Context) {
+	urlID := c.Param("app-url-id")
+
+	fmt.Println(urlID)
 }

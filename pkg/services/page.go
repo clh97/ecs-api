@@ -32,6 +32,29 @@ func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants
 		return nil, svcError
 	}
 
+	page := types.Page{
+		Title:    payload.Title,
+		URL:      payload.URL,
+		AppURLID: payload.AppURLID,
+	}
+
+	result, err := db.NamedExec("INSERT INTO ecs_page (title, url, app_id) VALUES (:title, :url, :appurlid)", page)
+
+	fmt.Println(result, page.Title)
+
+	if err != nil {
+		svcError := new(constants.ServiceError)
+		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+			Error:     errors.New("Unable to execute sql statement"),
+			Message:   "Internal server error",
+			Timestamp: time.Now(),
+			Success:   false,
+		}
+		svcError.HTTPStatus = http.StatusInternalServerError
+
+		return nil, svcError
+	}
+
 	svcResult := new(constants.ServiceResult)
 	svcResult.HTTPResponse = constants.THTTPResponse{
 		Data:      nil,
