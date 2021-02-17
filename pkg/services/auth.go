@@ -49,9 +49,9 @@ func CreateUser(payload dtos.AccountCreation) (*constants.ServiceResult, *consta
 
 	tx := db.MustBegin()
 
-	query := "INSERT INTO ecs_user (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)"
+	query := "INSERT INTO ecs_user (username, email, password) VALUES ($1, $2, $3)"
 
-	if _, err := tx.Exec(query, payload.FirstName, payload.LastName, payload.Email, hashed); err != nil {
+	if _, err := tx.Exec(query, payload.Username, payload.Email, hashed); err != nil {
 		svcError := new(constants.ServiceError)
 
 		if err, ok := err.(*pq.Error); ok {
