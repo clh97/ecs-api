@@ -16,7 +16,11 @@ ECS <- App <- Page <- User comment
 
 // CreatePage creates a page in a app, identified by urlid
 func CreatePage(c *gin.Context) {
-	payload := dtos.PageCreation{}
+	urlID := c.Param("app-url-id")
+
+	payload := dtos.PageCreation{
+		AppURLID: urlID,
+	}
 
 	// Binding
 	if err := c.ShouldBindJSON(&payload); err != nil {
