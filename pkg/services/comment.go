@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,8 +11,8 @@ import (
 	"github.com/clh97/ecs/store"
 )
 
-// CreateComment implements comment creation functionality
-func CreateComment(payload dtos.CommentCreation) (*constants.ServiceResult, *constants.ServiceError) {
+// CreatePublicComment implements comment creation functionality
+func CreatePublicComment(payload dtos.CommentCreation) (*constants.ServiceResult, *constants.ServiceError) {
 	db, err := store.CreateDBInstance()
 
 	defer db.Close()
@@ -29,5 +30,22 @@ func CreateComment(payload dtos.CommentCreation) (*constants.ServiceResult, *con
 		return nil, svcError
 	}
 
-	return nil, nil
+	// because it's a public comment, we need to set anonymous as true
+	payload.Anonymous = true
+
+	// var lastInsertedURLID string
+	// err = db.QueryRowx("INSERT INTO ecs_app (name, url, owner_id) VALUES ($1, $2, $3) RETURNING url_id", payload.Name, payload.URL, userID).Scan(&lastInsertedURLID)
+
+	result, err := db.NamedExec("INSERT INTO ecs_comment (app_id, page_id, content, content_format, anon_username, anon) VALUES (:appurlid, :pageid, :body, :format, :username, :anonymous)", payload)
+	fmt.Println(result)
+
+	svcResult := new(constants.ServiceResult)
+	svcResult.HTTPResponse = constants.THTTPResponse{
+		Message:   "Successfully created comment",
+		Timestamp: time.Now(),
+		Success:   true,
+	}
+	svcResult.HTTPStatus = http.StatusCreated
+
+	return svcResult, nil
 }
