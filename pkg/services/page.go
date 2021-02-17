@@ -170,8 +170,6 @@ func GetPages(payload dtos.PagesGet) (*constants.ServiceResult, *constants.Servi
 
 	err = db.Select(&pages, "SELECT page_id, title, slug, url FROM ecs_page WHERE app_id = $1", payload.AppURLID)
 
-	fmt.Println(err)
-
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:

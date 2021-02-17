@@ -7,14 +7,16 @@ import (
 	"github.com/clh97/ecs/pkg/constants"
 	"github.com/clh97/ecs/pkg/dtos"
 	"github.com/clh97/ecs/pkg/services"
-	"github.com/clh97/ecs/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 // CreateApp is the handler for the app creation endpoint
 func CreateApp(c *gin.Context) {
-	userID := utils.GetUserIDFromContext(c)
+	var result *constants.ServiceResult
+	var svcErr *constants.ServiceError
+
+	userID, svcErr := services.GetUserIDFromContext(c)
 
 	payload := dtos.AppCreation{}
 
@@ -35,7 +37,7 @@ func CreateApp(c *gin.Context) {
 	}
 
 	// Service
-	result, svcErr := services.CreateApp(payload, userID)
+	result, svcErr = services.CreateApp(payload, userID)
 
 	if svcErr != nil {
 		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
@@ -45,6 +47,7 @@ func CreateApp(c *gin.Context) {
 	c.JSON(result.HTTPStatus, result.HTTPResponse)
 }
 
+// DeleteApp is the handler for the app removal endpoint
 func DeleteApp(c *gin.Context) {
 	payload := dtos.AppDelete{}
 
@@ -75,9 +78,14 @@ func DeleteApp(c *gin.Context) {
 	c.JSON(result.HTTPStatus, result.HTTPResponse)
 }
 
-// GetApps is the handler for the app list endpoint
+// GetApps is the handler for the app listing endpoint
 func GetApps(c *gin.Context) {
-	userID := utils.GetUserIDFromContext(c)
+	userID, svcErr := services.GetUserIDFromContext(c)
+
+	if svcErr != nil {
+		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+		return
+	}
 
 	result, svcErr := services.GetApps(userID)
 
