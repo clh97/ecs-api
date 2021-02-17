@@ -2,8 +2,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS ecs_app (
   id serial PRIMARY KEY,
-  owner_id int NOT NULL,
-  url_id uuid DEFAULT uuid_generate_v4(),
+  owner_id int NOT NULL UNIQUE,
+  url_id uuid DEFAULT uuid_generate_v4() UNIQUE,
   name text NOT NULL,
   pages int[],
   url text,
@@ -17,12 +17,15 @@ CREATE TABLE IF NOT EXISTS ecs_page (
   title text NOT NULL,
   slug text,
   url text,
-  created_at timestamp NOT NULL DEFAULT NOW()
+  created_at timestamp NOT NULL DEFAULT NOW(),
+  CONSTRAINT fk_page
+    FOREIGN KEY (app_id)
+      REFERENCES ecs_app(url_id)
 );
 
 CREATE TABLE IF NOT EXISTS ecs_user (
   id serial PRIMARY KEY,
-  username text NOT NULL,
+  username text NOT NULL UNIQUE,
   email text NOT NULL UNIQUE,
   password text NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW()
