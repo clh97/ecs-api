@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/clh97/ecs/pkg/constants"
@@ -30,9 +29,6 @@ func CreatePage(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, constants.HTTPErrorResponse(err, "Validation/structure error", ""))
 		return
 	}
-
-	urlID := c.Param("app-url-id")
-	fmt.Println("App URL id:", urlID)
 
 	result, svcErr := services.CreatePage(payload)
 
@@ -65,9 +61,6 @@ func GetPage(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(result)
-
-	fmt.Println(urlID, pageID)
 	c.JSON(result.HTTPStatus, result.HTTPResponse)
 }
 

@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -165,7 +164,7 @@ func GetApps(userID int) (*constants.ServiceResult, *constants.ServiceError) {
 
 	if err != nil {
 		svcError := new(constants.ServiceError)
-		fmt.Println(err)
+
 		if err, ok := err.(*pq.Error); ok {
 			if constants.IsErrUniqueViolation(err) {
 				svcError.HTTPStatus = http.StatusConflict

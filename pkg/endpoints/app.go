@@ -13,10 +13,12 @@ import (
 
 // CreateApp is the handler for the app creation endpoint
 func CreateApp(c *gin.Context) {
-	var result *constants.ServiceResult
-	var svcErr *constants.ServiceError
+	userID, err := services.GetUserIDFromContext(c)
 
-	userID, svcErr := services.GetUserIDFromContext(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, constants.HTTPErrorResponse(err, "Unauthorized", ""))
+		return
+	}
 
 	payload := dtos.AppCreation{}
 
@@ -37,7 +39,7 @@ func CreateApp(c *gin.Context) {
 	}
 
 	// Service
-	result, svcErr = services.CreateApp(payload, userID)
+	result, svcErr := services.CreateApp(payload, userID)
 
 	if svcErr != nil {
 		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
@@ -80,10 +82,10 @@ func DeleteApp(c *gin.Context) {
 
 // GetApps is the handler for the app listing endpoint
 func GetApps(c *gin.Context) {
-	userID, svcErr := services.GetUserIDFromContext(c)
+	userID, err := services.GetUserIDFromContext(c)
 
-	if svcErr != nil {
-		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, constants.HTTPErrorResponse(err, "Unauthorized", ""))
 		return
 	}
 
