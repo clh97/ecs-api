@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -12,25 +11,15 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// CreateComment is the handler for the comment creation endpoint
-func CreateComment(c *gin.Context) {
-	var result *constants.ServiceResult
-	var svcErr *constants.ServiceError
-
-	userID, svcErr := services.GetUserIDFromContext(c)
-
-	// if svcErr != nil {
-	// 	c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
-	// 	return
-	// }
-
+// CreatePublicComment is the handler for the public comment creation endpoint
+func CreatePublicComment(c *gin.Context) {
 	urlID := c.Param("app-url-id")
 	pageID := c.Param("page-id")
 
 	payload := dtos.CommentCreation{
 		AppURLID: urlID,
 		PageID:   pageID,
-		UserID:   userID,
+		UserID:   0,
 	}
 
 	// Binding
@@ -49,16 +38,8 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
-	// setting as nil to be sure it wont inherit from last definition
-	svcErr = nil
-
 	// Service
-	if userID != 0 {
-		fmt.Println("100% authenticated comment coming!")
-	} else {
-		fmt.Println("Non-authenticated comment coming!")
-		result, svcErr = services.CreatePublicComment(payload)
-	}
+	result, svcErr := services.CreatePublicComment(payload)
 
 	if svcErr != nil {
 		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)

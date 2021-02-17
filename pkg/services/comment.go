@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -36,12 +35,24 @@ func CreatePublicComment(payload dtos.CommentCreation) (*constants.ServiceResult
 	// var lastInsertedURLID string
 	// err = db.QueryRowx("INSERT INTO ecs_app (name, url, owner_id) VALUES ($1, $2, $3) RETURNING url_id", payload.Name, payload.URL, userID).Scan(&lastInsertedURLID)
 
-	result, err := db.NamedExec("INSERT INTO ecs_comment (app_id, page_id, content, content_format, anon_username, anon) VALUES (:appurlid, :pageid, :body, :format, :username, :anonymous)", payload)
-	fmt.Println(result)
+	_, err = db.NamedExec("INSERT INTO ecs_comment (app_id, page_id, content, content_format, anon_username, anon) VALUES (:appurlid, :pageid, :body, :format, :username, :anonymous)", payload)
+
+	if err != nil {
+		svcError := new(constants.ServiceError)
+		svcError.HTTPErrorResponse = constants.THTTPErrorResponse{
+			Error:     errors.New("Unable to execute sql statement"),
+			Message:   "Internal server error",
+			Timestamp: time.Now(),
+			Success:   false,
+		}
+		svcError.HTTPStatus = http.StatusInternalServerError
+
+		return nil, svcError
+	}
 
 	svcResult := new(constants.ServiceResult)
 	svcResult.HTTPResponse = constants.THTTPResponse{
-		Message:   "Successfully created comment",
+		Message:   "Successfully created unauthenticated comment",
 		Timestamp: time.Now(),
 		Success:   true,
 	}
