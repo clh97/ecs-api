@@ -12,3 +12,8 @@ type App struct {
 	URL       string    `json:"Url,omitempty" db:"url"`
 	CreatedAt time.Time `json:"CreatedAt,omitempty" db:"created_at"`
 }
+
+// IsEmpty checks if the structure is empty
+func (a App) IsEmpty() bool {
+	return a.ID <= 0
+}

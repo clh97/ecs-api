@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS ecs_app (
 
 CREATE TABLE IF NOT EXISTS ecs_page (
   id serial PRIMARY KEY,
+  page_id uuid DEFAULT uuid_generate_v4(),
+  app_id uuid NOT NULL,
   title text NOT NULL,
+  slug text,
   url text,
   created_at timestamp NOT NULL DEFAULT NOW()
 );
@@ -35,10 +38,12 @@ CREATE TABLE IF NOT EXISTS ecs_anon (
 
 CREATE TABLE IF NOT EXISTS ecs_comment (
   id serial PRIMARY KEY, /* ecs_user.id or ecs_anon.id */
-  app_id serial, /* ecs_app.id */
-  page_id serial, /* ecs_app.pages[x].id */
-  user_id serial,
+  app_id uuid NOT NULL, /* ecs_app.id */
+  page_id uuid NOT NULL, /* ecs_app.pages[x].id */
+  user_id int DEFAULT 0,
   content text NOT NULL,
-  content_format text NOT NULL,
+  content_format text NOT NULL DEFAULT 'markdown',
+  anon boolean DEFAULT true, 
+  anon_username text,
   created_at timestamp NOT NULL DEFAULT NOW()
 );
