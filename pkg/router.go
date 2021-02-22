@@ -19,7 +19,7 @@ func InitRouter() *gin.Engine {
 	public.POST("/sign-in", endpoints.Authenticate)
 	public.GET("/page/:app-url-id/:page-id", endpoints.GetPage)
 	public.GET("/page/:app-url-id", endpoints.GetPages)
-	public.POST("/comment/:app-url-id/:page-id", endpoints.CreatePublicComment)
+	public.POST("/comment/:app-url-id/public/:page-id", endpoints.CreatePublicComment)
 	public.GET("/comment/:app-url-id/:page-id", endpoints.GetComments)
 
 	/* Private routes */
@@ -30,6 +30,7 @@ func InitRouter() *gin.Engine {
 		private.GET("/app", endpoints.GetApps)
 		private.DELETE("/app", endpoints.DeleteApp)
 		private.POST("/page/:app-url-id", endpoints.CreatePage)
+		private.POST("/comment/:app-url-id/private/:page-id", endpoints.CreatePrivateComment)
 	}
 
 	return r
