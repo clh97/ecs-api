@@ -7,6 +7,7 @@ import (
 	"github.com/clh97/ecs/pkg/constants"
 	"github.com/clh97/ecs/pkg/dtos"
 	"github.com/clh97/ecs/pkg/services"
+	"github.com/clh97/ecs/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -51,7 +52,7 @@ func CreatePublicComment(c *gin.Context) {
 
 // CreatePrivateComment is the handler for the private comment creation endpoint
 func CreatePrivateComment(c *gin.Context) {
-	userID, err := services.GetUserIDFromContext(c)
+	userID, err := utils.GetUserIDFromContext(c)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, constants.HTTPErrorResponse(err, "Unauthorized", ""))

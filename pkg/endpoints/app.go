@@ -7,13 +7,14 @@ import (
 	"github.com/clh97/ecs/pkg/constants"
 	"github.com/clh97/ecs/pkg/dtos"
 	"github.com/clh97/ecs/pkg/services"
+	"github.com/clh97/ecs/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 // CreateApp is the handler for the app creation endpoint
 func CreateApp(c *gin.Context) {
-	userID, err := services.GetUserIDFromContext(c)
+	userID, err := utils.GetUserIDFromContext(c)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, constants.HTTPErrorResponse(err, "Unauthorized", ""))
@@ -82,7 +83,7 @@ func DeleteApp(c *gin.Context) {
 
 // GetApps is the handler for the app listing endpoint
 func GetApps(c *gin.Context) {
-	userID, err := services.GetUserIDFromContext(c)
+	userID, err := utils.GetUserIDFromContext(c)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, constants.HTTPErrorResponse(err, "Unauthorized", ""))
