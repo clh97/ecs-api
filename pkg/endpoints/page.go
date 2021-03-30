@@ -37,11 +37,12 @@ func CreatePage(c *gin.Context) {
 	result, svcErr := services.CreatePage(payload)
 
 	if svcErr != nil {
-		c.AbortWithStatusJSON(svcErr.HTTPStatus, svcErr.HTTPErrorResponse)
+		c.Set("currentError", svcErr)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": true})
 		return
 	}
 
-	c.JSON(result.HTTPStatus, result.HTTPResponse)
+	c.JSON(http.StatusOK, result)
 }
 
 // GetPage returns a single page by its urlid and pageid

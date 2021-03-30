@@ -16,7 +16,7 @@ import (
 )
 
 // CreatePage implements page creation functionality
-func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants.ServiceError) {
+func CreatePage(payload dtos.PageCreation) (reqPage dtos.PageGet, err error) {
 	db, err := store.CreateDBInstance()
 
 	defer db.Close()
@@ -31,7 +31,7 @@ func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants
 		}
 		svcError.HTTPStatus = http.StatusInternalServerError
 
-		return nil, svcError
+		return reqPage, err
 	}
 
 	page := types.Page{
@@ -55,7 +55,7 @@ func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants
 		}
 		svcError.HTTPStatus = http.StatusInternalServerError
 
-		return nil, svcError
+		return reqPage, err
 	}
 
 	svcResult := new(constants.ServiceResult)
@@ -67,7 +67,7 @@ func CreatePage(payload dtos.PageCreation) (*constants.ServiceResult, *constants
 	}
 	svcResult.HTTPStatus = http.StatusCreated
 
-	return svcResult, nil
+	return reqPage, nil
 }
 
 // GetPage implements single page retrieval functionality

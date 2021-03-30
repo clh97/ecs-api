@@ -12,6 +12,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(middlewares.RequestID())
+	r.Use(middlewares.RequestStructure())
 
 	/* Public routes */
 	public := r.Group("/api/v1")
