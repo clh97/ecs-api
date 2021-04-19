@@ -1,5 +1,5 @@
 # ecs-api
-Comment system for JAMStack applications developed using Golang and Gin
+comment system :)
 
 # TODO
 1. middleware to construct httpresponse structure instead of services returning them
